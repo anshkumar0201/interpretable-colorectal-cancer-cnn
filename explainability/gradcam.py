@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
+
 def make_gradcam_heatmap(img_array, model, layer_name):
     grad_model = tf.keras.models.Model(
         model.inputs,
@@ -20,14 +21,18 @@ def make_gradcam_heatmap(img_array, model, layer_name):
     conv_outputs = conv_outputs[0]
     heatmap = conv_outputs @ pooled_grads[..., tf.newaxis]
     heatmap = tf.squeeze(heatmap)
-    heatmap = tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)
+
+    heatmap = tf.maximum(heatmap, 0)
+    heatmap /= tf.reduce_max(heatmap) + tf.keras.backend.epsilon()
 
     return heatmap.numpy()
+
 
 def display_gradcam(image, heatmap, alpha=0.4):
     heatmap = cv2.resize(heatmap, (image.shape[1], image.shape[0]))
     heatmap = np.uint8(255 * heatmap)
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+
     overlay = heatmap * alpha + image
 
     plt.imshow(overlay.astype("uint8"))
