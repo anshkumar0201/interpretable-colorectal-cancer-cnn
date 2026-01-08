@@ -1,89 +1,66 @@
 # Interpretable Deep Learning for Colorectal Cancer Histopathology
 
 ## Motivation
-Deep learning models achieve high accuracy in histopathology classification, but
-their black-box nature limits trust and clinical interpretability. In medical
-contexts, understanding *why* a model makes a prediction is as important as the
-prediction itself.
-
-This project focuses on **interpretable deep learning** for colorectal cancer
-histopathology by integrating **Grad-CAM–based error analysis** into a CNN trained
-using transfer learning.
+Deep learning models achieve strong performance in histopathology classification,
+but their lack of interpretability limits clinical trust. This project focuses on
+making convolutional neural networks interpretable by analyzing model errors using
+Grad-CAM visual explanations.
 
 ---
 
 ## Project Overview
-This repository contains an end-to-end pipeline for:
-- Classifying colorectal tissue types from histopathology images
-- Visualizing model attention using Grad-CAM
-- Systematically analyzing **misclassifications**
-- Comparing incorrect predictions with correct reference samples
+This repository contains an interpretable deep-learning pipeline for classifying
+colorectal cancer tissue types from histopathology images. The system integrates:
 
-Rather than evaluating performance only through accuracy, the project
-investigates *failure modes* and tissue-level ambiguity.
+- Transfer learning with ResNet50
+- Grad-CAM–based interpretability
+- Error-driven analysis of misclassifications
+- A deployable Streamlit interface
+
+Rather than evaluating only accuracy, the project investigates *why* the model
+confuses certain tissue types.
 
 ---
 
 ## Dataset
-- **Type:** Histopathology image patches
-- **Classes:** adipose, complex, debris, empty, lympho, mucosa, stroma, tumor
-- **Input Size:** 224 × 224 RGB
-- **Preprocessing:** normalization, resizing, categorical encoding
+- Histopathology image patches
+- 8 classes: adipose, complex, debris, empty, lympho, mucosa, stroma, tumor
+- Input size: 224 × 224 RGB
 
-> This project is intended for educational and research exploration only and is
-> not a clinical diagnostic system.
+This project is for educational and research exploration only.
 
 ---
 
 ## Model Architecture
-- **Base model:** ResNet50 (ImageNet pretrained)
-- **Transfer learning strategy:**
-  - Frozen convolutional backbone
-  - Dense layer (128 units, ReLU)
-  - Dropout (0.5)
-  - Softmax output (8 tissue classes)
+- ResNet50 (ImageNet pretrained)
+- Custom dense layer (128 units, ReLU)
+- Dropout (0.5)
+- Softmax output (8 classes)
 
 ---
 
-## Interpretability & Error Analysis
-- Grad-CAM is computed using the final convolutional block (`conv5_block3_out`)
-- The pipeline automatically:
-  - Detects misclassified samples
-  - Visualizes Grad-CAM heatmaps for errors
-  - Compares them against correctly classified examples from:
-    - the predicted class
-    - the true class
-
-This enables qualitative investigation of morphological similarities that lead
-to classification confusion.
-
----
-
-## Limitations
-- Patch-level inference (not whole-slide images)
-- Dataset size and annotation constraints
-- Interpretability results are qualitative
-
----
-
-## Future Work
-- Whole-slide inference
-- Quantitative Grad-CAM similarity analysis
-- Integration with clinical metadata
-- Deployment as an interactive web application
-
----
-
-## Technologies Used
-TensorFlow • Keras • ResNet50 • Grad-CAM • NumPy • OpenCV • Matplotlib • Streamlit
+## Interpretability
+Grad-CAM is applied using the final convolutional block of ResNet50
+(`conv5_block3_out`) to visualize spatial attention for predictions and errors.
 
 ## Data Directory
 
-This folder is intended to store training and testing data.
+Place the following files here:
+- X_train.npy
+- y_train.npy
+- X_test.npy
+- y_test.npy
 
-Due to size and licensing constraints, datasets are not included in this
-repository. Users should place preprocessed image arrays and labels here.
+Data is excluded from the repository due to size and licensing constraints.
 
-Example expected variables:
-- X_train, y_train
-- X_test, y_test
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/anshkumar0201/interpretable-colorectal-cancer-cnn.git
+cd interpretable-colorectal-cancer-cnn
+pip install -r requirements.txt
+python run_training.py
+streamlit run app/streamlit_app.py
+
