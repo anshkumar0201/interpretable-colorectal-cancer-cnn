@@ -2,6 +2,7 @@ from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.models import Model
 
+
 def build_model(num_classes=8):
     base_model = ResNet50(include_top=True, weights="imagenet")
 
@@ -12,9 +13,11 @@ def build_model(num_classes=8):
 
     model = Model(base_model.input, output)
 
+    # Freeze backbone
     for layer in model.layers:
         layer.trainable = False
 
+    # Fine-tune last layers
     for layer in model.layers[-3:]:
         layer.trainable = True
 
