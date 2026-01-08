@@ -6,11 +6,24 @@ from explainability.gradcam import make_gradcam_heatmap, display_gradcam
 st.set_page_config(layout="wide")
 st.title("Interpretable Colorectal Cancer Histopathology Classifier")
 
-st.markdown("""
-This application visualizes **Grad-CAM explanations** for a deep-learning model
-trained on colorectal cancer histopathology images, with a focus on model errors.
-""")
+uploaded = st.file_uploader("Upload a histopathology image", type=["png", "jpg", "jpeg"])
 
-st.info("Upload or select sample images to visualize model attention.")
+if uploaded:
+    image = tf.io.decode_image(uploaded.read(), channels=3)
+    image = tf.image.resize(image, (224, 224))
+    image = image.numpy() / 255.0
 
-st.warning("Demo app structure – connect model and data for full functionality.")
+    model = tf.keras.models.load_model("checkpoints/trained_model.h5")
+
+    preds = model.predict(image[np.newaxis, ...])
+    pred_class = np.argmax(preds[0])
+
+    st.write(f"Predicted class index: {pred_class}")
+
+    heatmap = make_gradcam_heatmap(
+        image[np.newaxis, ...],
+        model,
+        "conv5_block3_out"
+    )
+
+    display_gradcam(image, heatmap)
